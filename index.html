@@ -1,0 +1,77 @@
+<html>
+
+<head>
+	<title >
+		Messenger
+    </title>
+    <style>
+        #chat{
+            height:500px;
+            }
+    </style>
+</head>
+
+<body>
+    <h1 align="center">my page</h1>
+    <div id="chat"></div>
+        <div id="send-message">
+            <div id="output"></div>
+            <div id="feedback"></div>
+        </div>   
+        <input  size="35" id="handle" placeholder="Handle"></input>
+    	<input  size="35" id="message" placeholder="Enter Message"></input>
+    	<button id="submit">Send</button>
+    </div>
+
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+  
+    <script src="http://localhost:3000/socket.io/socket.io.js"></script>
+     
+     
+    <script>
+        
+    var socket = io.connect();
+    
+    var message=document.getElementById("message");
+    var btn=document.getElementById("submit");
+    var output=document.getElementById("output");
+    var handle=document.getElementById("handle");
+    var feedback=document.getElementById("feedback");
+   
+
+    
+    //functionality of btn
+    btn.onclick=function(){
+
+        socket.emit('chat',{
+        message:message.value,
+        handle:handle.value
+        
+    });
+};
+  
+
+    //to output data on screen
+    socket.on('chat',function(data){
+        feedback.innerHTML='';
+        output.innerHTML+='<p><strong>'+data.handle+':</strong>'+data.message+'</p>';
+        message.value='';
+    });
+
+    //to braodacast  typing msg
+
+    message.onkeypress=function(){
+       
+        socket.emit('typing',handle.value);
+    };
+
+    socket.on('typing',function(data){
+        
+        feedback.innerHTML='<p><em>'+data+' is typing a message....</em></p>';
+    });
+
+
+    </script>
+</body>
+
+</html>
